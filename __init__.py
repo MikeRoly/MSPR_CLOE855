@@ -49,6 +49,30 @@ def Readfiche(post_id):
     # Rendre le template HTML et transmettre les données
     return render_template('read_data.html', data=data)
 
+@app.route('/authentification-user', methods=['GET', 'POST'])
+def authentification():
+    if request.method == 'POST':
+        # Vérifier les identifiants
+        if request.form['username'] == 'admin' and request.form['password'] == 'password': # password à cacher par la suite
+            session['authentifie'] = True
+            # Rediriger vers la route lecture après une authentification réussie
+            return redirect(url_for('lecture'))
+        else:
+            # Afficher un message d'erreur si les identifiants sont incorrects
+            return render_template('formulaire_authentification-user.html', error=True)
+
+    return render_template('formulaire_authentification-user.html', error=False)
+
+@app.route('/fiche_nom/<int:post_id>')
+def Readfiche(post_id):
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM nom WHERE id = ?', (post_id,))
+    data = cursor.fetchall()
+    conn.close()
+    # Rendre le template HTML et transmettre les données
+    return render_template('read_data.html', data=data)
+
 @app.route('/consultation/')
 def ReadBDD():
     conn = sqlite3.connect('database.db')
